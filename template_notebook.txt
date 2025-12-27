@@ -1,0 +1,120 @@
+Dưới đây là khung (template) notebook chuyên nghiệp để bạn trình bày dự án Employee Attrition. Tôi đã sắp xếp theo luồng tư duy logic: **Đặt vấn đề -> Xử lý dữ liệu -> Xây dựng mô hình -> Giải thích kết quả -> Đề xuất giải pháp.**
+
+Bạn có thể copy các ô markdown này vào Jupyter Notebook/Colab và chèn code của bạn vào các vị trí tương ứng.
+
+---
+
+# 📋 DỰ ÁN DỰ ĐOÁN NGHỈ VIỆC CỦA NHÂN VIÊN (EMPLOYEE ATTRITION PREDICTION)
+
+## 1. Giới thiệu (Introduction)
+**Mục tiêu:**
+Nhân sự là tài sản quan trọng nhất của doanh nghiệp. Việc nhân viên nghỉ việc (Attrition) gây tốn kém chi phí tuyển dụng, đào tạo và làm gián đoạn quy trình làm việc. Dự án này nhằm mục đích:
+1.  Xác định các yếu tố chính ảnh hưởng đến quyết định nghỉ việc.
+2.  Xây dựng mô hình Machine Learning để dự đoán nhân viên có nguy cơ nghỉ việc.
+3.  Đưa ra đề xuất giúp doanh nghiệp giữ chân nhân tài.
+
+**Dữ liệu:** [Mô tả ngắn gọn về bộ dataset, ví dụ: IBM HR Analytics...]
+
+---
+
+## 2. Khám phá & Tiền xử lý dữ liệu (EDA & Preprocessing)
+
+### 2.1. Tải dữ liệu và kiểm tra tổng quan
+*   Kiểm tra kích thước, kiểu dữ liệu, giá trị thiếu (missing values).
+*   Loại bỏ các cột không mang thông tin hữu ích (ví dụ: EmployeeCount, EmployeeNumber...).
+
+*(Chèn code load data, info, describe tại đây)*
+
+### 2.2. Phân tích dữ liệu thăm dò (Exploratory Data Analysis - EDA)
+*   Quan sát phân phối của biến mục tiêu (`Attrition`).
+*   Tìm mối tương quan giữa các biến (Correlation Matrix).
+*   Trực quan hóa một số yếu tố quan trọng (ví dụ: Tỷ lệ nghỉ việc theo Lương, Tuổi, OverTime...).
+
+*(Chèn code vẽ biểu đồ EDA tại đây)*
+
+### 2.3. Mã hóa dữ liệu (Feature Encoding)
+Để mô hình có thể hiểu được dữ liệu, chúng ta cần chuyển đổi các biến định tính sang định lượng:
+*   **Label Encoding:** Cho biến mục tiêu và biến có thứ tự (Gender, BusinessTravel...).
+*   **One-Hot Encoding:** Cho các biến danh mục không có thứ tự (Department, JobRole...).
+
+*(Chèn code phần Encoding tại đây)*
+
+### 2.4. Chia tập dữ liệu (Train/Test Split)
+Chia dữ liệu theo tỷ lệ 80% Train - 20% Test.
+*   **Lưu ý quan trọng:** Sử dụng `stratify=y` để đảm bảo tỷ lệ người nghỉ việc ở hai tập là tương đồng, tránh hiện tượng lệch dữ liệu.
+
+*(Chèn code train_test_split tại đây)*
+
+---
+
+## 3. Xây dựng và Huấn luyện mô hình (Modeling)
+
+Chúng ta sẽ thử nghiệm hai thuật toán mạnh mẽ thuộc họ cây quyết định (Tree-based models), vốn rất hiệu quả với dữ liệu dạng bảng và phi tuyến:
+1.  **Random Forest:** Mạnh về độ ổn định, ít bị overfitting.
+2.  **XGBoost:** Thuật toán Boosting tiên tiến, thường cho hiệu suất cao hơn.
+
+### 3.1. Random Forest Classifier
+*   Sử dụng `class_weight='balanced'` để xử lý vấn đề mất cân bằng mẫu.
+*   Tối ưu hóa tham số bằng `RandomizedSearchCV`.
+
+*(Chèn code train Random Forest tại đây)*
+
+### 3.2. XGBoost Classifier
+*   Sử dụng `scale_pos_weight` để tăng trọng số cho lớp thiểu số (Người nghỉ việc).
+*   Tối ưu hóa tham số (learning_rate, max_depth...) bằng `RandomizedSearchCV`.
+
+*(Chèn code train XGBoost tại đây)*
+
+---
+
+## 4. Đánh giá và So sánh (Evaluation & Comparison)
+
+Sử dụng các thước đo chuyên dụng cho bài toán phân loại:
+*   **ROC-AUC:** Đánh giá khả năng phân loại tổng quát.
+*   **Confusion Matrix:** Xem chi tiết số lượng dự đoán đúng/sai ở từng lớp.
+*   **Recall (cho lớp Leave):** Khả năng phát hiện nhân viên sắp nghỉ (quan trọng nhất để không bỏ sót rủi ro).
+
+### 4.1. Kết quả Random Forest
+*(Chèn code in classification report, confusion matrix của RF)*
+
+### 4.2. Kết quả XGBoost
+*(Chèn code in classification report, confusion matrix của XGB)*
+
+### 4.3. Nhận xét so sánh
+*   **Về ROC-AUC:** Cả hai mô hình đều đạt kết quả tốt (> 0.8), cho thấy khả năng phân loại đáng tin cậy. Random Forest nhỉnh hơn một chút về điểm số tổng quát.
+*   **Về khả năng phát hiện rủi ro (Recall):** XGBoost thể hiện vượt trội hơn (Recall ~54%) so với Random Forest (Recall ~37%). Điều này có nghĩa là XGBoost giúp doanh nghiệp "bắt" được nhiều trường hợp có ý định nghỉ việc hơn, dù chấp nhận tỷ lệ báo động giả cao hơn một chút.
+
+---
+
+## 5. Giải thích mô hình (Model Interpretation)
+
+Mô hình "hộp đen" không đủ để thuyết phục doanh nghiệp. Chúng ta cần hiểu *tại sao* mô hình đưa ra dự đoán đó.
+
+### 5.1. Feature Importance (Tầm quan trọng của các biến)
+Dưới đây là các yếu tố tác động mạnh nhất đến quyết định nghỉ việc theo đánh giá của hai mô hình.
+
+*(Chèn code và biểu đồ Feature Importance của cả 2 model tại đây)*
+
+### 5.2. Insight rút ra từ dữ liệu
+Dựa trên biểu đồ, các yếu tố hàng đầu bao gồm:
+1.  **Incentive (Chế độ thưởng/khích lệ):** Là yếu tố quan trọng nhất ở cả hai mô hình.
+2.  **Monthly Income & Job Level:** Thu nhập và cấp bậc đóng vai trò then chốt.
+3.  **YearsWithCurrManager:** Mối quan hệ với quản lý trực tiếp ảnh hưởng lớn đến sự gắn bó.
+4.  **Stress & OverTime:** Áp lực công việc cũng là nguyên nhân đáng kể.
+
+---
+
+## 6. Kết luận và Đề xuất (Conclusion & Recommendation)
+
+### 6.1. Lựa chọn mô hình
+Đề xuất sử dụng **XGBoost** cho bài toán sàng lọc sớm nhân viên có nguy cơ nghỉ việc, vì mô hình này có độ nhạy (Recall) cao hơn, giúp giảm thiểu việc bỏ sót nhân tài.
+
+### 6.2. Đề xuất hành động cho doanh nghiệp (Action Plan)
+Dựa trên các Insight từ mô hình, bộ phận nhân sự nên cân nhắc:
+1.  **Rà soát chính sách Thưởng (Incentive):** Đảm bảo cơ chế thưởng hấp dẫn, công bằng và kịp thời.
+2.  **Xây dựng lộ trình thăng tiến (Job Level):** Minh bạch hóa lộ trình phát triển để nhân viên thấy được tương lai tại công ty, đặc biệt ở các cấp bậc thấp/trung.
+3.  **Nâng cao năng lực Quản lý (Manager):** Tổ chức các khóa đào tạo kỹ năng lãnh đạo, giao tiếp cho các cấp quản lý để cải thiện mối quan hệ với nhân viên.
+4.  **Cân bằng công việc (Work-life balance):** Theo dõi chỉ số Stress và Overtime để có biện pháp can thiệp, giảm tải kịp thời.
+
+---
+*(Hết notebook)*
